@@ -6,7 +6,6 @@ function decodeToken(encodedToken) {
 }
 
 const GITHUB_TOKEN = decodeToken(ENCODED_GITHUB_TOKEN);
-console.log("Decoded Token:", GITHUB_TOKEN); // Now accessible
 
 
 const token = GITHUB_TOKEN;
