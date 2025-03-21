@@ -1,5 +1,13 @@
 import OpenAI from "https://cdn.skypack.dev/openai";
-import { GITHUB_TOKEN } from "./config.js";
+import { ENCODED_GITHUB_TOKEN } from "./config.js";
+
+function decodeToken(encodedToken) {
+    return atob(encodedToken);  // Decodes Base64 token
+}
+
+const GITHUB_TOKEN = decodeToken(ENCODED_GITHUB_TOKEN);
+console.log("Decoded Token:", GITHUB_TOKEN); // Now accessible
+
 
 const token = GITHUB_TOKEN;
 
@@ -44,5 +52,7 @@ export async function main(userCommand) {
     });
 
     console.log(response.choices[0].message.content); // Corrected response structure
-    return JSON.parse(response.choices[0].message.content); // Correct JSON parsing
+    const content = response.choices[0].message.content.trim();  // Add this line
+    const cleanedContent = content.replace(/```json|```/g, '').trim();  // Add this line
+    return JSON.parse(cleanedContent);
 }
