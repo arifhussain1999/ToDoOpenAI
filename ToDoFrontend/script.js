@@ -7,16 +7,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     clearTaskOutput();
 });
-function clearTaskOutput(){
-    const task=document.querySelector('.task.info');
-    if(taskInfo){
-        document.getElementById('task').textContent='';
-        document.getElementById('urgency').textContent='';
-        document.getElementById('datetime').textContent='';
+function clearTaskOutput() {
+    const taskInfo = document.querySelector('.task-info');
+    if (taskInfo) {
+        document.getElementById('task').textContent = '';
+        document.getElementById('urgency').textContent = '';
+        document.getElementById('datetime').textContent = '';
     }
-    const confirmationArea=document.getElementById('confirmation-area');
-    if(confirmationArea){
-        confirmationArea.innerHTML='';
+    const confirmationArea = document.getElementById('confirmation-area');
+    if (confirmationArea) {
+        confirmationArea.innerHTML = '';
     }
 }
 
@@ -36,32 +36,43 @@ function startListening() {
     } else {
         alert("Not supported by the browser");
     }
-    processCommand("Add Clean car on 25th March 2025 highly urgent")
 }
 
 async function processCommand(command) {
     try {
-        const aiResponse = await processWithAI(command);
-        const requestBody={
-            operation:aiResponse.operation,
-            task:aiResponse.task,
-            urgency:aiResponse.urgency,
-            dateTime:aiResponse.dateTime
-        }
-        const response=await fetch("http://localhost:8080/api/add",{
-            method:"POST",
-            headers:{
-                "Content-type":"application/json",
-                "Accept":"application/json"
-            },
-            body:JSON.stringify(requestBody)
-        });
-        if(response.ok){
+        const aiResp = await processWithAI(command);
+        console.log("AI Response:", aiResp);
 
-        }else{
-            
+        const aiResponse = aiResp.choices?.[0]?.message?.content || aiResp;
+        const parsedResponse = typeof aiResponse === 'string' ? JSON.parse(aiResponse) : aiResponse;
+
+        const requestBody = {
+            operation: parsedResponse.operation,
+            task: parsedResponse.task,
+            urgency: parsedResponse.urgency,
+            dateTime: parsedResponse.dateTime
+        };
+
+        const response = await fetch("http://localhost:8080/api/add", {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+        if (!response.ok) {
+            console.error(`Http error with status code: ${response.status}`);
+            return { error: `Request failed with status ${response.status}` };
         }
+
+        const responseData = await response.json();
+        return responseData;
+
     } catch (error) {
         console.error("Error processing command:", error);
+        return { error: "Internal processing error" };
     }
 }
+
