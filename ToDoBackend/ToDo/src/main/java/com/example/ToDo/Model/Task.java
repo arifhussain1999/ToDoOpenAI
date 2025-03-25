@@ -1,11 +1,9 @@
 package com.example.ToDo.Model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -21,5 +19,7 @@ public class Task {
     String operation;
     String task;
     String urgency;
+
+    @JsonProperty("date_time")
     String dateTime;
 }
